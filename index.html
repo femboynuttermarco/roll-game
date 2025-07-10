@@ -1,77 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Roll Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
+<script>
+  const items = [
+    {
+      name: "1oneam",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Microphone.jpg/640px-Microphone.jpg",
+      rarity: "1 in 25",
+      chance: 4
+    },
+    {
+      name: "summrs",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Headphones_Studio.jpg/640px-Headphones_Studio.jpg",
+      rarity: "1 in 10",
+      chance: 10
+    },
+    {
+      name: "nettspend",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Credit_card.png/640px-Credit_card.png",
+      rarity: "1 in 50",
+      chance: 2
+    },
+    {
+      name: "osamason",
+      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Vinyl_record_icon.png/640px-Vinyl_record_icon.png",
+      rarity: "1 in 75",
+      chance: 1.33
     }
-    #result {
-      display: none;
-      margin-top: 20px;
-    }
-    img {
-      max-width: 300px;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <h1>Roll the Gacha!</h1>
-  <button onclick="roll()">Roll</button>
+  ];
 
-  <div id="result">
-    <img id="itemImage" src="" alt="Rolled item">
-    <p id="itemText"></p>
-    <p id="itemRarity"></p>
-  </div>
+  function roll() {
+    const totalWeight = items.reduce((sum, item) => sum + item.chance, 0);
+    let random = Math.random() * totalWeight;
 
-  <script>
-    const items = [
-      {
-        name: "Monkey",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Baby_Monkey_on_Mom%27s_Back.jpg/640px-Baby_Monkey_on_Mom%27s_Back.jpg",
-        rarity: "1 in 50",
-        chance: 2
-      },
-      {
-        name: "Dragon",
-        image: "https://upload.wikimedia.org/wikipedia/commons/6/6b/Dragon_from_Komodo.jpg",
-        rarity: "1 in 1000",
-        chance: 0.1
-      },
-      {
-        name: "Cat",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/640px-Cat03.jpg",
-        rarity: "1 in 25",
-        chance: 4
-      },
-      {
-        name: "Dog",
-        image: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Dog_breeds.jpg",
-        rarity: "1 in 10",
-        chance: 10
+    for (let item of items) {
+      if (random < item.chance) {
+        document.getElementById('itemImage').src = item.image;
+        document.getElementById('itemText').textContent = `You have rolled ${item.name}!`;
+        document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
+        document.getElementById('result').style.display = 'block';
+        return;
       }
-    ];
-
-    function roll() {
-      const totalWeight = items.reduce((sum, item) => sum + item.chance, 0);
-      let random = Math.random() * totalWeight;
-
-      for (let item of items) {
-        if (random < item.chance) {
-          document.getElementById('itemImage').src = item.image;
-          document.getElementById('itemText').textContent = `You have rolled a ${item.name}!`;
-          document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
-          document.getElementById('result').style.display = 'block';
-          return;
-        }
-        random -= item.chance;
-      }
+      random -= item.chance;
     }
-  </script>
-</body>
-</html>
+  }
+</script>
