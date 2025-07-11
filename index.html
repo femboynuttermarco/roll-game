@@ -176,8 +176,8 @@
   </div>
 
   <script>
-    const items =
-            {
+    const items = [
+      {
         name: "Lisa Lisa",
         image:
           "https://tse4.mm.bing.net/th/id/OIP.y0zhKLjaCQHgDJ71GW91ZwHaKd?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -290,7 +290,7 @@
         chance: 0.57,
       },
     ];
-        
+
     let pulledSet = new Set();
     let coins = 0;
     let pullCounts = {};
@@ -330,7 +330,7 @@
         const matchesSearch = item.name.toLowerCase().includes(searchQuery);
         const matchesRarity = !rarityFilter || item.rarity === rarityFilter;
 
-        if (!matchesSearch || (rarityFilter && item.rarity !== rarityFilter)) return;
+        if (!matchesSearch || !matchesRarity) return;
 
         const div = document.createElement("div");
         div.className = "artist-card";
@@ -340,16 +340,18 @@
         name.className = "artist-name";
         const rarity = document.createElement("div");
         rarity.className = "artist-rarity";
-        rarity.textContent = item.rarity;
 
         if (isUnlocked) {
           name.textContent = item.name;
-          const unlockedIndex = unlockedItems.length;
-          div.onclick = () => openModal(unlockedIndex);
+          rarity.textContent = item.rarity;
+          img.style.filter = "";
+          div.onclick = () => openModal(item.name);
           unlockedItems.push(item);
         } else {
-          img.classList.add("blurred");
           name.textContent = "???";
+          rarity.textContent = "";
+          img.style.filter = "blur(10px)";
+          div.onclick = null;
         }
 
         div.appendChild(img);
@@ -360,92 +362,113 @@
     }
 
     function populateFilterOptions() {
-      const raritySet = new Set(items.map(item => item.rarity));
-      const filter = document.getElementById("rarityFilter");
-      raritySet.forEach(rarity => {
+      const rarityFilter = document.getElementById("rarityFilter");
+      const rarities = [...new Set(items.map((i) => i.rarity))].sort();
+
+      rarities.forEach((r) => {
         const option = document.createElement("option");
-        option.value = rarity;
-        option.textContent = rarity;
-        filter.appendChild(option);
+        option.value = r;
+        option.textContent = r;
+        rarityFilter.appendChild(option);
       });
     }
 
     function updateCoinDisplay() {
-      document.querySelectorAll(".coinCount").forEach(
-        (el) => (el.textContent = `Coins: ${coins}`)
-      );
-      saveGame();
-    }
-
-    function pull() {
-      if (coins < 50) {
-        alert("Not enough coins! Earn more by clicking the coin.");
-        return;
-      }
-      coins -= 50;
-      updateCoinDisplay();
-
-      const totalChance = items.reduce((sum, item) => sum + item.chance, 0);
-      let rand = Math.random() * totalChance;
-      let pulledItem;
-      for (const item of items) {
-        rand -= item.chance;
-        if (rand <= 0) {
-          pulledItem = item;
-          break;
-        }
-      }
-
-      pullCounts[pulledItem.name] = (pullCounts[pulledItem.name] || 0) + 1;
-      pulledSet.add(pulledItem.name);
-      updateIndexList();
-
-      document.getElementById("message").textContent = `You pulled: ${pulledItem.name}!`;
-      const resultDiv = document.getElementById("result");
-      resultDiv.style.display = "block";
-      document.getElementById("itemImage").src = pulledItem.image;
-      document.getElementById("itemText").textContent = pulledItem.name;
-      document.getElementById("itemRarity").textContent = `Rarity: ${pulledItem.rarity}`;
-
-      saveGame();
+      document.querySelectorAll(".coinCount").forEach((el) => {
+        el.textContent = `Coins: ${coins}`;
+      });
     }
 
     function earnCoin() {
       coins++;
       updateCoinDisplay();
+      saveGame();
     }
 
-    function showSection(id) {
+    function showSection(name) {
       ["menu", "pull", "index", "coins"].forEach((section) => {
         document.getElementById(section).classList.remove("active");
       });
-      document.getElementById(id).classList.add("active");
-      document.getElementById("message").textContent = "";
+      document.getElementById(name).classList.add("active");
+      if (name === "index") {
+        updateIndexList();
+      }
     }
 
-    // Modal Functions
-    function openModal(i) {
-      modalIndex = i;
-      updateModal();
-      document.getElementById("modal").style.display = "flex";
+    function pull() {
+      const cost = 50;
+      if (coins < cost) {
+        document.getElementById("message").textContent = "Not enough coins!";
+        return;
+      }
+      coins -= cost;
+      updateCoinDisplay();
+      document.getElementById("message").textContent = "";
+
+      // Pull logic based on chances
+      // Build a weighted list for random selection
+      let weightedItems = [];
+      items.forEach((item) => {
+        let count = Math.round(item.chance * 10); // increase weights to make random
+        for (let i = 0; i < count; i++) {
+          weightedItems.push(item);
+        }
+      });
+
+      const pulledItem = weightedItems[Math.floor(Math.random() * weightedItems.length)];
+
+      // Update pulledSet and pullCounts
+      pulledSet.add(pulledItem.name);
+      pullCounts[pulledItem.name] = (pullCounts[pulledItem.name] || 0) + 1;
+
+      saveGame();
+
+      // Show result
+      const resultDiv = document.getElementById("result");
+      const itemImage = document.getElementById("itemImage");
+      const itemText = document.getElementById("itemText");
+      const itemRarity = document.getElementById("itemRarity");
+
+      itemImage.src = pulledItem.image;
+      itemText.textContent = pulledItem.name;
+      itemRarity.textContent = "Rarity: " + pulledItem.rarity;
+      resultDiv.style.display = "block";
+
+      updateIndexList();
     }
+
+    function openModal(name) {
+      const modal = document.getElementById("modal");
+      modal.style.display = "flex";
+
+      modalIndex = unlockedItems.findIndex((i) => i.name === name);
+      updateModal();
+    }
+
     function closeModal() {
       document.getElementById("modal").style.display = "none";
     }
-    function navigateModal(direction) {
-      if (unlockedItems.length === 0) return;
-      modalIndex += direction;
+
+    function updateModal() {
+      if (modalIndex < 0) modalIndex = 0;
+      if (modalIndex >= unlockedItems.length) modalIndex = unlockedItems.length - 1;
+
+      const item = unlockedItems[modalIndex];
+      if (!item) return;
+
+      document.getElementById("modalImage").src = item.image;
+      document.getElementById("modalName").textContent = item.name;
+      document.getElementById("modalRarity").textContent = "Rarity: " + item.rarity;
+    }
+
+    function navigateModal(dir) {
+      modalIndex += dir;
       if (modalIndex < 0) modalIndex = unlockedItems.length - 1;
       if (modalIndex >= unlockedItems.length) modalIndex = 0;
       updateModal();
     }
-    function updateModal() {
-      const item = unlockedItems[modalIndex];
-      document.getElementById("modalImage").src = item.image;
-      document.getElementById("modalName").textContent = item.name;
-      document.getElementById("modalRarity").textContent = `Rarity: ${item.rarity}`;
-    }
 
+    // Load game data when page loads
     window.onload = loadGame;
   </script>
 </body>
