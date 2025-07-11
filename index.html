@@ -2,46 +2,97 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Roll Game</title>
+  <title>Underground RNG</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #111;
+      color: white;
       text-align: center;
-      margin-top: 50px;
     }
-    #result {
+
+    .menu-bar {
+      background-color: #222;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .menu-bar button {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .menu-bar button:hover {
+      background-color: #666;
+    }
+
+    .section {
       display: none;
-      margin-top: 20px;
+      padding: 30px;
     }
+
+    .active {
+      display: block;
+    }
+
     img {
       max-width: 300px;
       margin-top: 10px;
+      border-radius: 10px;
     }
-    #indexList {
-      margin-top: 40px;
-    }
+
     .rolled {
       font-weight: bold;
-      color: green;
+      color: lime;
     }
+
     .not-rolled {
       color: gray;
       opacity: 0.6;
     }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    h1, h2 {
+      margin-bottom: 20px;
+    }
   </style>
 </head>
 <body>
-  <h1>Roll the Artist!</h1>
-  <button onclick="roll()">Roll</button>
 
-  <div id="result">
-    <img id="itemImage" src="" alt="Rolled item">
-    <p id="itemText"></p>
-    <p id="itemRarity"></p>
+  <div class="menu-bar">
+    <button onclick="showSection('menu')">Menu</button>
+    <button onclick="showSection('roll')">Roll</button>
+    <button onclick="showSection('index')">Index</button>
   </div>
 
-  <div id="indexList">
-    <h2>Collection</h2>
+  <div id="menu" class="section active">
+    <h1>Underground RNG</h1>
+  </div>
+
+  <div id="roll" class="section">
+    <h2>Roll the Artist!</h2>
+    <button onclick="roll()">Roll</button>
+    <div id="result" style="margin-top: 20px;">
+      <img id="itemImage" src="" alt="Rolled item">
+      <p id="itemText"></p>
+      <p id="itemRarity"></p>
+    </div>
+  </div>
+
+  <div id="index" class="section">
+    <h2>Your Collection</h2>
     <ul id="artistIndex"></ul>
   </div>
 
@@ -49,31 +100,38 @@
     const items = [
       {
         name: "1oneam",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/01/Microphone.jpg/640px-Microphone.jpg",
+        image: "https://tse3.mm.bing.net/th/id/OIP.A8khKcsvIOv8CEdGb8MzhwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
         rarity: "1 in 25",
         chance: 4
       },
       {
         name: "summrs",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Headphones_Studio.jpg/640px-Headphones_Studio.jpg",
+        image: "https://th.bing.com/th/id/OIP.4dYbI1Gg7ggfOXOBUC76BwAAAA?w=131&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
         rarity: "1 in 10",
         chance: 10
       },
       {
         name: "nettspend",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Credit_card.png/640px-Credit_card.png",
+        image: "https://th.bing.com/th/id/OIP.R6d7AGZ6x7bUeT7fZ0eg9gHaHa?w=170&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
         rarity: "1 in 50",
         chance: 2
       },
       {
         name: "osamason",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Vinyl_record_icon.png/640px-Vinyl_record_icon.png",
+        image: "https://th.bing.com/th/id/OIP.oaz6mkuhrcsEDwAVAVjNQQHaEK?w=322&h=181&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
         rarity: "1 in 75",
         chance: 1.33
       }
     ];
 
     const rolledSet = new Set();
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById(id).classList.add('active');
+    }
 
     function updateIndexList() {
       const index = document.getElementById('artistIndex');
@@ -106,7 +164,7 @@
       }
     }
 
-    // Initialize the index display
+    // Initialize index display
     updateIndexList();
   </script>
 </body>
