@@ -61,6 +61,13 @@
       width: 100px;
       margin-top: 20px;
     }
+    #searchFilterContainer {
+      margin-bottom: 1rem;
+    }
+    #searchInput, #rarityFilter {
+      padding: 0.5rem;
+      margin: 0 0.5rem;
+    }
     /* Modal Styles */
     #modal {
       display: none;
@@ -137,6 +144,13 @@
 
   <div id="index" class="section">
     <h2>Your Collection</h2>
+    <div id="searchFilterContainer">
+      <input type="text" id="searchInput" placeholder="Search name..." oninput="updateIndexList()" />
+      <select id="rarityFilter" onchange="updateIndexList()">
+        <option value="">All Rarities</option>
+        <!-- Filter options are added dynamically -->
+      </select>
+    </div>
     <div id="artistIndex"></div>
   </div>
 
@@ -162,8 +176,8 @@
   </div>
 
   <script>
-    const items = [
-      {
+    const items =
+            {
         name: "Lisa Lisa",
         image:
           "https://tse4.mm.bing.net/th/id/OIP.y0zhKLjaCQHgDJ71GW91ZwHaKd?rs=1&pid=ImgDetMain&o=7&rm=3",
@@ -276,7 +290,7 @@
         chance: 0.57,
       },
     ];
-
+        
     let pulledSet = new Set();
     let coins = 0;
     let pullCounts = {};
@@ -293,6 +307,7 @@
       if (savedCounts !== null) pullCounts = JSON.parse(savedCounts);
 
       updateCoinDisplay();
+      populateFilterOptions();
       updateIndexList();
     }
 
@@ -304,10 +319,19 @@
 
     function updateIndexList() {
       const index = document.getElementById("artistIndex");
+      const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+      const rarityFilter = document.getElementById("rarityFilter").value;
+
       index.innerHTML = "";
       unlockedItems = [];
 
-      items.forEach((item, i) => {
+      items.forEach((item) => {
+        const isUnlocked = pulledSet.has(item.name);
+        const matchesSearch = item.name.toLowerCase().includes(searchQuery);
+        const matchesRarity = !rarityFilter || item.rarity === rarityFilter;
+
+        if (!matchesSearch || (rarityFilter && item.rarity !== rarityFilter)) return;
+
         const div = document.createElement("div");
         div.className = "artist-card";
         const img = document.createElement("img");
@@ -318,10 +342,11 @@
         rarity.className = "artist-rarity";
         rarity.textContent = item.rarity;
 
-        if (pulledSet.has(item.name)) {
+        if (isUnlocked) {
           name.textContent = item.name;
-          div.onclick = () => openModal(i);
-          unlockedItems.push({ ...item, index: i });
+          const unlockedIndex = unlockedItems.length;
+          div.onclick = () => openModal(unlockedIndex);
+          unlockedItems.push(item);
         } else {
           img.classList.add("blurred");
           name.textContent = "???";
@@ -331,6 +356,17 @@
         div.appendChild(name);
         div.appendChild(rarity);
         index.appendChild(div);
+      });
+    }
+
+    function populateFilterOptions() {
+      const raritySet = new Set(items.map(item => item.rarity));
+      const filter = document.getElementById("rarityFilter");
+      raritySet.forEach(rarity => {
+        const option = document.createElement("option");
+        option.value = rarity;
+        option.textContent = rarity;
+        filter.appendChild(option);
       });
     }
 
@@ -349,7 +385,6 @@
       coins -= 50;
       updateCoinDisplay();
 
-      // Weighted pull
       const totalChance = items.reduce((sum, item) => sum + item.chance, 0);
       let rand = Math.random() * totalChance;
       let pulledItem;
@@ -361,22 +396,16 @@
         }
       }
 
-      // Update pull count
       pullCounts[pulledItem.name] = (pullCounts[pulledItem.name] || 0) + 1;
       pulledSet.add(pulledItem.name);
       updateIndexList();
 
-      // Show result
       document.getElementById("message").textContent = `You pulled: ${pulledItem.name}!`;
       const resultDiv = document.getElementById("result");
       resultDiv.style.display = "block";
-      const itemImage = document.getElementById("itemImage");
-      const itemText = document.getElementById("itemText");
-      const itemRarity = document.getElementById("itemRarity");
-
-      itemImage.src = pulledItem.image;
-      itemText.textContent = pulledItem.name;
-      itemRarity.textContent = `Rarity: ${pulledItem.rarity}`;
+      document.getElementById("itemImage").src = pulledItem.image;
+      document.getElementById("itemText").textContent = pulledItem.name;
+      document.getElementById("itemRarity").textContent = `Rarity: ${pulledItem.rarity}`;
 
       saveGame();
     }
@@ -394,7 +423,7 @@
       document.getElementById("message").textContent = "";
     }
 
-    // Modal related
+    // Modal Functions
     function openModal(i) {
       modalIndex = i;
       updateModal();
@@ -411,7 +440,6 @@
       updateModal();
     }
     function updateModal() {
-      if (unlockedItems.length === 0) return;
       const item = unlockedItems[modalIndex];
       document.getElementById("modalImage").src = item.image;
       document.getElementById("modalName").textContent = item.name;
