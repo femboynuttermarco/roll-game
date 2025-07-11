@@ -28,24 +28,17 @@
 
   let pulledSet = new Set();
   let coins = 0;
+  let pullCounts = {}; // Track how many times each item has been pulled
 
   // Load saved data from localStorage
   function loadGame() {
     const savedCoins = localStorage.getItem('coins');
     const savedPulled = localStorage.getItem('pulled');
+    const savedCounts = localStorage.getItem('pullCounts');
 
-    if (savedCoins !== null) {
-      coins = parseInt(savedCoins);
-    }
-
-    if (savedPulled !== null) {
-      try {
-        const pulledArray = JSON.parse(savedPulled);
-        pulledSet = new Set(pulledArray);
-      } catch (e) {
-        console.error("Failed to load pulled data", e);
-      }
-    }
+    if (savedCoins !== null) coins = parseInt(savedCoins);
+    if (savedPulled !== null) pulledSet = new Set(JSON.parse(savedPulled));
+    if (savedCounts !== null) pullCounts = JSON.parse(savedCounts);
 
     updateCoinDisplay();
     updateIndexList();
@@ -55,6 +48,7 @@
   function saveGame() {
     localStorage.setItem('coins', coins);
     localStorage.setItem('pulled', JSON.stringify(Array.from(pulledSet)));
+    localStorage.setItem('pullCounts', JSON.stringify(pullCounts));
   }
 
   function updateIndexList() {
@@ -67,9 +61,7 @@
 
       const img = document.createElement('img');
       img.src = item.image;
-      if (!pulledSet.has(item.name)) {
-        img.classList.add('blurred');
-      }
+      if (!pulledSet.has(item.name)) img.classList.add('blurred');
 
       const name = document.createElement('div');
       name.className = 'artist-name';
@@ -120,6 +112,21 @@
         document.getElementById('result').style.display = 'block';
 
         pulledSet.add(item.name);
+
+        // Update pull count
+        if (!pullCounts[item.name]) {
+          pullCounts[item.name] = 1;
+        } else {
+          pullCounts[item.name]++;
+        }
+
+        // Refund 25 coins every 7 pulls of the same artist
+        if (pullCounts[item.name] % 7 === 0) {
+          coins += 25;
+          document.getElementById('message').textContent = `Bonus! You've pulled ${item.name} ${pullCounts[item.name]} times and got a 25 coin refund!`;
+        }
+
+        updateCoinDisplay();
         updateIndexList();
         saveGame();
         return;
