@@ -17,6 +17,17 @@
       max-width: 300px;
       margin-top: 10px;
     }
+    #indexList {
+      margin-top: 40px;
+    }
+    .rolled {
+      font-weight: bold;
+      color: green;
+    }
+    .not-rolled {
+      color: gray;
+      opacity: 0.6;
+    }
   </style>
 </head>
 <body>
@@ -27,6 +38,11 @@
     <img id="itemImage" src="" alt="Rolled item">
     <p id="itemText"></p>
     <p id="itemRarity"></p>
+  </div>
+
+  <div id="indexList">
+    <h2>Collection</h2>
+    <ul id="artistIndex"></ul>
   </div>
 
   <script>
@@ -57,6 +73,20 @@
       }
     ];
 
+    const rolledSet = new Set();
+
+    function updateIndexList() {
+      const index = document.getElementById('artistIndex');
+      index.innerHTML = '';
+
+      for (let item of items) {
+        const li = document.createElement('li');
+        li.textContent = item.name;
+        li.className = rolledSet.has(item.name) ? 'rolled' : 'not-rolled';
+        index.appendChild(li);
+      }
+    }
+
     function roll() {
       const totalWeight = items.reduce((sum, item) => sum + item.chance, 0);
       let random = Math.random() * totalWeight;
@@ -67,11 +97,17 @@
           document.getElementById('itemText').textContent = `You have rolled ${item.name}!`;
           document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
           document.getElementById('result').style.display = 'block';
+
+          rolledSet.add(item.name);
+          updateIndexList();
           return;
         }
         random -= item.chance;
       }
     }
+
+    // Initialize the index display
+    updateIndexList();
   </script>
 </body>
 </html>
