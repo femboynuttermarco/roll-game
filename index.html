@@ -118,24 +118,23 @@
         chance: 1.33
       },
       {
-        name: "Hatsune Miku"
-        image: "https://th.bing.com/th/id/OIP.tDzXoGvz5fRymqUtI0YB8AHaIp?w=146&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3"
-        rarity: "1 in 100"
+        name: "Hatsune Miku",
+        image: "https://th.bing.com/th/id/OIP.tDzXoGvz5fRymqUtI0YB8AHaIp?w=146&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7",
+        rarity: "1 in 100",
         chance: 1
       },
-      {  
-        name: "Maka"
-        image: "https://th.bing.com/th/id/OIP.wE1ZvAEm9wIRZYtlb6o7rAHaQN?w=115&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-        rarity: "1 in 50"
+      {
+        name: "Maka",
+        image: "https://th.bing.com/th/id/OIP.wE1ZvAEm9wIRZYtlb6o7rAHaQN?w=115&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        rarity: "1 in 50",
         chance: 2
       },
       {
-        name: "Tsubaki"
-        image: "https://th.bing.com/th/id/OIP.WM0YEWmLIfWR-2a9uVHvYAHaM1?w=115&h=187&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-        rarity: "1 in 75"
-        chance: 1,33
-      },
-      {
+        name: "Tsubaki",
+        image: "https://th.bing.com/th/id/OIP.WM0YEWmLIfWR-2a9uVHvYAHaM1?w=115&h=187&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        rarity: "1 in 75",
+        chance: 1.33
+      }
     ];
 
     let pulledSet = new Set();
@@ -221,14 +220,12 @@
 
           pulledSet.add(item.name);
 
-          // Update pull count
           if (!pullCounts[item.name]) {
             pullCounts[item.name] = 1;
           } else {
             pullCounts[item.name]++;
           }
 
-          // Refund if pulled 7 times
           if (pullCounts[item.name] % 7 === 0) {
             coins += 25;
             document.getElementById('message').textContent = `Bonus! You've pulled ${item.name} ${pullCounts[item.name]} times and got a 25 coin refund!`;
