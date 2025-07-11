@@ -40,6 +40,7 @@
       display: inline-block;
       margin: 1rem;
       text-align: center;
+      cursor: pointer;
     }
     .artist-card img {
       width: 150px;
@@ -59,6 +60,53 @@
       cursor: pointer;
       width: 100px;
       margin-top: 20px;
+    }
+    /* Modal Styles */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #modal img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+    #modal h2 {
+      margin-top: 1rem;
+    }
+    .modal-arrow {
+      position: absolute;
+      top: 50%;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      background: rgba(0,0,0,0.4);
+      padding: 0.5rem;
+      border-radius: 50%;
+      user-select: none;
+    }
+    .left-arrow {
+      left: 2%;
+    }
+    .right-arrow {
+      right: 2%;
+    }
+    .close-btn {
+      position: absolute;
+      top: 2%;
+      right: 2%;
+      font-size: 2rem;
+      cursor: pointer;
+      background: red;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
     }
   </style>
 </head>
@@ -99,55 +147,32 @@
     <img id="coinImage" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Gold_coin_icon.png/600px-Gold_coin_icon.png" onclick="earnCoin()">
   </div>
 
+  <!-- Modal -->
+  <div id="modal">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <span class="modal-arrow left-arrow" onclick="navigateModal(-1)">❮</span>
+    <img id="modalImage" src="">
+    <h2 id="modalName"></h2>
+    <p id="modalRarity"></p>
+    <span class="modal-arrow right-arrow" onclick="navigateModal(1)">❯</span>
+  </div>
+
   <script>
     const items = [
-      {
-        name: "Lisa Lisa",
-        image: "https://tse4.mm.bing.net/th/id/OIP.y0zhKLjaCQHgDJ71GW91ZwHaKd?rs=1&pid=ImgDetMain&o=7&rm=3",
-        rarity: "1 in 25",
-        chance: 4
-      },
-      {
-        name: "Neru",
-        image: "https://th.bing.com/th/id/OIP.WjAqEqyufM79-L-WtnzmdgAAAA?w=154&h=205&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-        rarity: "1 in 10",
-        chance: 10
-      },
-      {
-        name: "Erina",
-        image: "https://th.bing.com/th/id/OIP.A0t4pltDRfkompIlU8cmhwAAAA?w=161&h=206&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-        rarity: "1 in 50",
-        chance: 2
-      },
-      {
-        name: "Kasane Teto",
-        image: "https://th.bing.com/th/id/OIP.kmRq4xsIWtuqsRuuKDJXXQHaRA?w=152&h=349&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-        rarity: "1 in 75",
-        chance: 1.33
-      },
-      {
-        name: "Hatsune Miku",
-        image: "https://th.bing.com/th/id/OIP.tDzXoGvz5fRymqUtI0YB8AHaIp?w=146&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7",
-        rarity: "1 in 100",
-        chance: 1
-      },
-      {
-        name: "Maka",
-        image: "https://th.bing.com/th/id/OIP.wE1ZvAEm9wIRZYtlb6o7rAHaQN?w=115&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-        rarity: "1 in 50",
-        chance: 2
-      },
-      {
-        name: "Tsubaki",
-        image: "https://th.bing.com/th/id/OIP.WM0YEWmLIfWR-2a9uVHvYAHaM1?w=115&h=187&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-        rarity: "1 in 75",
-        chance: 1.33
-      }
+      { name: "Lisa Lisa", image: "https://tse4.mm.bing.net/th/id/OIP.y0zhKLjaCQHgDJ71GW91ZwHaKd?rs=1&pid=ImgDetMain&o=7&rm=3", rarity: "1 in 25", chance: 4 },
+      { name: "Neru", image: "https://th.bing.com/th/id/OIP.WjAqEqyufM79-L-WtnzmdgAAAA?w=154&h=205&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", rarity: "1 in 10", chance: 10 },
+      { name: "Erina", image: "https://th.bing.com/th/id/OIP.A0t4pltDRfkompIlU8cmhwAAAA?w=161&h=206&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", rarity: "1 in 50", chance: 2 },
+      { name: "Kasane Teto", image: "https://th.bing.com/th/id/OIP.kmRq4xsIWtuqsRuuKDJXXQHaRA?w=152&h=349&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3", rarity: "1 in 75", chance: 1.33 },
+      { name: "Hatsune Miku", image: "https://th.bing.com/th/id/OIP.tDzXoGvz5fRymqUtI0YB8AHaIp?w=146&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7", rarity: "1 in 100", chance: 1 },
+      { name: "Maka", image: "https://th.bing.com/th/id/OIP.wE1ZvAEm9wIRZYtlb6o7rAHaQN?w=115&h=184&c=7&r=0&o=5&dpr=1.3&pid=1.7", rarity: "1 in 50", chance: 2 },
+      { name: "Tsubaki", image: "https://th.bing.com/th/id/OIP.WM0YEWmLIfWR-2a9uVHvYAHaM1?w=115&h=187&c=7&r=0&o=5&dpr=1.3&pid=1.7", rarity: "1 in 75", chance: 1.33 }
     ];
 
     let pulledSet = new Set();
     let coins = 0;
     let pullCounts = {};
+    let modalIndex = 0;
+    let unlockedItems = [];
 
     function loadGame() {
       const savedCoins = localStorage.getItem('coins');
@@ -171,28 +196,33 @@
     function updateIndexList() {
       const index = document.getElementById('artistIndex');
       index.innerHTML = '';
+      unlockedItems = [];
 
-      for (let item of items) {
+      items.forEach((item, i) => {
         const div = document.createElement('div');
         div.className = 'artist-card';
-
         const img = document.createElement('img');
         img.src = item.image;
-        if (!pulledSet.has(item.name)) img.classList.add('blurred');
-
         const name = document.createElement('div');
         name.className = 'artist-name';
-        name.textContent = pulledSet.has(item.name) ? item.name : "???";
-
         const rarity = document.createElement('div');
         rarity.className = 'artist-rarity';
         rarity.textContent = item.rarity;
+
+        if (pulledSet.has(item.name)) {
+          name.textContent = item.name;
+          div.onclick = () => openModal(i);
+          unlockedItems.push({ ...item, index: i });
+        } else {
+          img.classList.add('blurred');
+          name.textContent = "???";
+        }
 
         div.appendChild(img);
         div.appendChild(name);
         div.appendChild(rarity);
         index.appendChild(div);
-      }
+      });
     }
 
     function updateCoinDisplay() {
@@ -232,12 +262,7 @@
           document.getElementById('result').style.display = 'block';
 
           pulledSet.add(item.name);
-
-          if (!pullCounts[item.name]) {
-            pullCounts[item.name] = 1;
-          } else {
-            pullCounts[item.name]++;
-          }
+          pullCounts[item.name] = (pullCounts[item.name] || 0) + 1;
 
           if (pullCounts[item.name] % 7 === 0) {
             coins += 25;
@@ -251,6 +276,28 @@
         }
         random -= item.chance;
       }
+    }
+
+    function openModal(i) {
+      modalIndex = unlockedItems.findIndex(u => u.index === i);
+      showModalItem();
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function showModalItem() {
+      const item = unlockedItems[modalIndex];
+      document.getElementById('modalImage').src = item.image;
+      document.getElementById('modalName').textContent = item.name;
+      document.getElementById('modalRarity').textContent = `Rarity: ${item.rarity}`;
+    }
+
+    function navigateModal(direction) {
+      modalIndex = (modalIndex + direction + unlockedItems.length) % unlockedItems.length;
+      showModalItem();
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
     }
 
     window.onload = loadGame;
