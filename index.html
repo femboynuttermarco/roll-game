@@ -1,140 +1,230 @@
-<script>
-  const items = [
-    {
-      name: "1oneam",
-      image: "https://tse3.mm.bing.net/th/id/OIP.A8khKcsvIOv8CEdGb8MzhwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
-      rarity: "1 in 25",
-      chance: 4
-    },
-    {
-      name: "summrs",
-      image: "https://th.bing.com/th/id/OIP.4dYbI1Gg7ggfOXOBUC76BwAAAA?w=131&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
-      rarity: "1 in 10",
-      chance: 10
-    },
-    {
-      name: "nettspend",
-      image: "https://th.bing.com/th/id/OIP.R6d7AGZ6x7bUeT7fZ0eg9gHaHa?w=170&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      rarity: "1 in 50",
-      chance: 2
-    },
-    {
-      name: "osamason",
-      image: "https://th.bing.com/th/id/OIP.oaz6mkuhrcsEDwAVAVjNQQHaEK?w=322&h=181&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
-      rarity: "1 in 75",
-      chance: 1.33
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Underground RNG</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #111;
+      color: white;
     }
-  ];
-
-  let pulledSet = new Set();
-  let coins = 0;
-  let pullCounts = {}; // Track how many times each item has been pulled
-
-  // Load saved data from localStorage
-  function loadGame() {
-    const savedCoins = localStorage.getItem('coins');
-    const savedPulled = localStorage.getItem('pulled');
-    const savedCounts = localStorage.getItem('pullCounts');
-
-    if (savedCoins !== null) coins = parseInt(savedCoins);
-    if (savedPulled !== null) pulledSet = new Set(JSON.parse(savedPulled));
-    if (savedCounts !== null) pullCounts = JSON.parse(savedCounts);
-
-    updateCoinDisplay();
-    updateIndexList();
-  }
-
-  // Save to localStorage
-  function saveGame() {
-    localStorage.setItem('coins', coins);
-    localStorage.setItem('pulled', JSON.stringify(Array.from(pulledSet)));
-    localStorage.setItem('pullCounts', JSON.stringify(pullCounts));
-  }
-
-  function updateIndexList() {
-    const index = document.getElementById('artistIndex');
-    index.innerHTML = '';
-
-    for (let item of items) {
-      const div = document.createElement('div');
-      div.className = 'artist-card';
-
-      const img = document.createElement('img');
-      img.src = item.image;
-      if (!pulledSet.has(item.name)) img.classList.add('blurred');
-
-      const name = document.createElement('div');
-      name.className = 'artist-name';
-      name.textContent = pulledSet.has(item.name) ? item.name : "???";
-
-      div.appendChild(img);
-      div.appendChild(name);
-      index.appendChild(div);
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      background: #222;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
     }
-  }
+    nav button {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+    .section {
+      display: none;
+      padding: 2rem;
+    }
+    .active {
+      display: block;
+    }
+    .blurred {
+      filter: blur(8px);
+    }
+    .artist-card {
+      display: inline-block;
+      margin: 1rem;
+      text-align: center;
+    }
+    .artist-card img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    #coinImage {
+      cursor: pointer;
+      width: 100px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
 
-  function updateCoinDisplay() {
-    document.getElementById('coinCount').textContent = `Coins: ${coins}`;
-    saveGame();
-  }
+  <nav>
+    <button onclick="showSection('menu')">Menu</button>
+    <button onclick="showSection('pull')">Pull</button>
+    <button onclick="showSection('index')">Index</button>
+    <button onclick="showSection('coins')">Coins</button>
+  </nav>
 
-  function showSection(id) {
-    document.querySelectorAll('.section').forEach(section => {
-      section.classList.remove('active');
-    });
-    document.getElementById('message').textContent = '';
-    document.getElementById(id).classList.add('active');
-  }
+  <div id="menu" class="section active">
+    <h1>Underground RNG</h1>
+  </div>
 
-  function earnCoin() {
-    coins += 1;
-    updateCoinDisplay();
-  }
+  <div id="pull" class="section">
+    <h2>Pull Section</h2>
+    <p id="coinCount">Coins: 0</p>
+    <button onclick="pull()">Pull (50 Coins)</button>
+    <div id="message" style="margin-top: 1rem; color: gold;"></div>
+    <div id="result" style="display: none; margin-top: 2rem;">
+      <img id="itemImage" src="" width="300"><br>
+      <p id="itemText"></p>
+      <p id="itemRarity"></p>
+    </div>
+  </div>
 
-  function pull() {
-    if (coins < 50) {
-      document.getElementById('message').textContent = "Not enough coins! Earn more in the Coins section.";
-      return;
+  <div id="index" class="section">
+    <h2>Your Collection</h2>
+    <div id="artistIndex"></div>
+  </div>
+
+  <div id="coins" class="section">
+    <h2>Earn Coins</h2>
+    <p>Click the image to earn 1 coin</p>
+    <p id="coinCount">Coins: 0</p>
+    <img id="coinImage" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Gold_coin_icon.png/600px-Gold_coin_icon.png" onclick="earnCoin()">
+  </div>
+
+  <script>
+    const items = [
+      {
+        name: "1oneam",
+        image: "https://tse3.mm.bing.net/th/id/OIP.A8khKcsvIOv8CEdGb8MzhwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
+        rarity: "1 in 25",
+        chance: 4
+      },
+      {
+        name: "summrs",
+        image: "https://th.bing.com/th/id/OIP.4dYbI1Gg7ggfOXOBUC76BwAAAA?w=131&h=180&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+        rarity: "1 in 10",
+        chance: 10
+      },
+      {
+        name: "nettspend",
+        image: "https://th.bing.com/th/id/OIP.R6d7AGZ6x7bUeT7fZ0eg9gHaHa?w=170&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+        rarity: "1 in 50",
+        chance: 2
+      },
+      {
+        name: "osamason",
+        image: "https://th.bing.com/th/id/OIP.oaz6mkuhrcsEDwAVAVjNQQHaEK?w=322&h=181&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+        rarity: "1 in 75",
+        chance: 1.33
+      }
+    ];
+
+    let pulledSet = new Set();
+    let coins = 0;
+    let pullCounts = {};
+
+    function loadGame() {
+      const savedCoins = localStorage.getItem('coins');
+      const savedPulled = localStorage.getItem('pulled');
+      const savedCounts = localStorage.getItem('pullCounts');
+
+      if (savedCoins !== null) coins = parseInt(savedCoins);
+      if (savedPulled !== null) pulledSet = new Set(JSON.parse(savedPulled));
+      if (savedCounts !== null) pullCounts = JSON.parse(savedCounts);
+
+      updateCoinDisplay();
+      updateIndexList();
     }
 
-    coins -= 50;
-    updateCoinDisplay();
-    document.getElementById('message').textContent = "";
+    function saveGame() {
+      localStorage.setItem('coins', coins);
+      localStorage.setItem('pulled', JSON.stringify(Array.from(pulledSet)));
+      localStorage.setItem('pullCounts', JSON.stringify(pullCounts));
+    }
 
-    const totalWeight = items.reduce((sum, item) => sum + item.chance, 0);
-    let random = Math.random() * totalWeight;
+    function updateIndexList() {
+      const index = document.getElementById('artistIndex');
+      index.innerHTML = '';
 
-    for (let item of items) {
-      if (random < item.chance) {
-        document.getElementById('itemImage').src = item.image;
-        document.getElementById('itemText').textContent = `You have pulled ${item.name}!`;
-        document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
-        document.getElementById('result').style.display = 'block';
+      for (let item of items) {
+        const div = document.createElement('div');
+        div.className = 'artist-card';
 
-        pulledSet.add(item.name);
+        const img = document.createElement('img');
+        img.src = item.image;
+        if (!pulledSet.has(item.name)) img.classList.add('blurred');
 
-        // Update pull count
-        if (!pullCounts[item.name]) {
-          pullCounts[item.name] = 1;
-        } else {
-          pullCounts[item.name]++;
-        }
+        const name = document.createElement('div');
+        name.className = 'artist-name';
+        name.textContent = pulledSet.has(item.name) ? item.name : "???";
 
-        // Refund 25 coins every 7 pulls of the same artist
-        if (pullCounts[item.name] % 7 === 0) {
-          coins += 25;
-          document.getElementById('message').textContent = `Bonus! You've pulled ${item.name} ${pullCounts[item.name]} times and got a 25 coin refund!`;
-        }
+        div.appendChild(img);
+        div.appendChild(name);
+        index.appendChild(div);
+      }
+    }
 
-        updateCoinDisplay();
-        updateIndexList();
-        saveGame();
+    function updateCoinDisplay() {
+      document.querySelectorAll('#coinCount').forEach(el => el.textContent = `Coins: ${coins}`);
+      saveGame();
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+      document.getElementById('message').textContent = '';
+      document.getElementById(id).classList.add('active');
+    }
+
+    function earnCoin() {
+      coins += 1;
+      updateCoinDisplay();
+    }
+
+    function pull() {
+      if (coins < 50) {
+        document.getElementById('message').textContent = "Not enough coins! Earn more in the Coins section.";
         return;
       }
-      random -= item.chance;
-    }
-  }
 
-  // Initialize on page load
-  window.onload = loadGame;
-</script>
+      coins -= 50;
+      updateCoinDisplay();
+      document.getElementById('message').textContent = "";
+
+      const totalWeight = items.reduce((sum, item) => sum + item.chance, 0);
+      let random = Math.random() * totalWeight;
+
+      for (let item of items) {
+        if (random < item.chance) {
+          document.getElementById('itemImage').src = item.image;
+          document.getElementById('itemText').textContent = `You have pulled ${item.name}!`;
+          document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
+          document.getElementById('result').style.display = 'block';
+
+          pulledSet.add(item.name);
+
+          // Update pull count
+          if (!pullCounts[item.name]) {
+            pullCounts[item.name] = 1;
+          } else {
+            pullCounts[item.name]++;
+          }
+
+          // Refund if pulled 7 times
+          if (pullCounts[item.name] % 7 === 0) {
+            coins += 25;
+            document.getElementById('message').textContent = `Bonus! You've pulled ${item.name} ${pullCounts[item.name]} times and got a 25 coin refund!`;
+          }
+
+          updateCoinDisplay();
+          updateIndexList();
+          saveGame();
+          return;
+        }
+        random -= item.chance;
+      }
+    }
+
+    window.onload = loadGame;
+  </script>
+</body>
+</html>
