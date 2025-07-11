@@ -106,7 +106,7 @@
 
   <div class="menu-bar">
     <button onclick="showSection('menu')">Menu</button>
-    <button onclick="showSection('roll')">Roll</button>
+    <button onclick="showSection('pull')">Pull</button>
     <button onclick="showSection('index')">Index</button>
     <button onclick="showSection('coins')">Coins</button>
   </div>
@@ -115,12 +115,12 @@
     <h1>Underground RNG</h1>
   </div>
 
-  <div id="roll" class="section">
-    <h2>Roll the Artist (Cost: 50 Coins)</h2>
-    <button onclick="roll()">Roll</button>
+  <div id="pull" class="section">
+    <h2>Pull the Artist (Cost: 50 Coins)</h2>
+    <button onclick="pull()">Pull</button>
     <p id="message"></p>
     <div id="result" style="margin-top: 20px;">
-      <img id="itemImage" src="" alt="Rolled item">
+      <img id="itemImage" src="" alt="Pulled item">
       <p id="itemText"></p>
       <p id="itemRarity"></p>
     </div>
@@ -165,7 +165,7 @@
       }
     ];
 
-    const rolledSet = new Set();
+    const pulledSet = new Set();
     let coins = 0;
 
     function showSection(id) {
@@ -186,13 +186,13 @@
 
         const img = document.createElement('img');
         img.src = item.image;
-        if (!rolledSet.has(item.name)) {
+        if (!pulledSet.has(item.name)) {
           img.classList.add('blurred');
         }
 
         const name = document.createElement('div');
         name.className = 'artist-name';
-        name.textContent = rolledSet.has(item.name) ? item.name : "???";
+        name.textContent = pulledSet.has(item.name) ? item.name : "???";
 
         div.appendChild(img);
         div.appendChild(name);
@@ -209,7 +209,7 @@
       updateCoinDisplay();
     }
 
-    function roll() {
+    function pull() {
       if (coins < 50) {
         document.getElementById('message').textContent = "Not enough coins! Earn more in the Coins section.";
         return;
@@ -225,11 +225,11 @@
       for (let item of items) {
         if (random < item.chance) {
           document.getElementById('itemImage').src = item.image;
-          document.getElementById('itemText').textContent = `You have rolled ${item.name}!`;
+          document.getElementById('itemText').textContent = `You have pulled ${item.name}!`;
           document.getElementById('itemRarity').textContent = `Rarity: ${item.rarity}`;
           document.getElementById('result').style.display = 'block';
 
-          rolledSet.add(item.name);
+          pulledSet.add(item.name);
           updateIndexList();
           return;
         }
