@@ -1,80 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Female RNG</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Female RNG</title>
+  <style>
+    /* === GLOBAL === */
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #111;
+      color: white;
+      margin: 0;
+    }
 
-  <body>
-    <!-- Navigation Bar -->
-    <nav>
-      <button onclick="showSection('menu')">Menu</button>
-      <button onclick="showSection('pull')">Pull</button>
-      <button onclick="showSection('index')">Index</button>
-      <button onclick="showSection('coins')">Coins</button>
-    </nav>
+    .gold-text {
+      margin-top: 1rem;
+      color: gold;
+    }
 
-    <!-- MENU SECTION -->
-    <div id="menu" class="section active">
-      <h1>Female RNG</h1>
+    .section {
+      display: none;
+      padding: 2rem;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .blurred {
+      filter: blur(8px);
+    }
+
+    /* === NAVIGATION === */
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      background: #222;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+    }
+
+    nav button {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+    }
+
+    nav button:hover {
+      background: #666;
+    }
+
+    /* === PULL SECTION === */
+    .pull-result {
+      display: none;
+      margin-top: 2rem;
+    }
+
+    /* === INDEX / COLLECTION === */
+    #searchFilterContainer {
+      margin-bottom: 1rem;
+    }
+
+    #searchInput,
+    #rarityFilter {
+      padding: 0.5rem;
+      margin: 0 0.5rem;
+    }
+
+    .artist-card {
+      display: inline-block;
+      margin: 1rem;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .artist-card img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .artist-name {
+      font-weight: bold;
+      margin-top: 0.5rem;
+    }
+
+    .artist-rarity {
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    /* === COIN SECTION === */
+    #coinImage {
+      cursor: pointer;
+      width: 100px;
+      margin-top: 20px;
+    }
+
+    /* === MODAL === */
+    #modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    #modal img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+
+    #modal h2 {
+      margin-top: 1rem;
+    }
+
+    .modal-arrow {
+      position: absolute;
+      top: 50%;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.5rem;
+      border-radius: 50%;
+      user-select: none;
+    }
+
+    .left-arrow {
+      left: 2%;
+    }
+
+    .right-arrow {
+      right: 2%;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 2%;
+      right: 2%;
+      font-size: 2rem;
+      cursor: pointer;
+      background: red;
+      padding: 0.2rem 0.6rem;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVIGATION BAR -->
+  <nav>
+    <button onclick="showSection('menu')">Menu</button>
+    <button onclick="showSection('pull')">Pull</button>
+    <button onclick="showSection('index')">Index</button>
+    <button onclick="showSection('coins')">Coins</button>
+  </nav>
+
+  <!-- MENU -->
+  <div id="menu" class="section active">
+    <h1>Female RNG</h1>
+  </div>
+
+  <!-- PULL -->
+  <div id="pull" class="section">
+    <h2>Pull Section</h2>
+    <p class="coinCount">Coins: 0</p>
+    <button onclick="pull()">Pull (50 Coins)</button>
+    <div id="message" class="gold-text"></div>
+
+    <div id="result" class="pull-result">
+      <img id="itemImage" src="" width="300" />
+      <p id="itemText"></p>
+      <p id="itemRarity"></p>
     </div>
+  </div>
 
-    <!-- PULL SECTION -->
-    <div id="pull" class="section">
-      <h2>Pull Section</h2>
-      <p class="coinCount">Coins: 0</p>
-      <button onclick="pull()">Pull (50 Coins)</button>
-      <div id="message" class="gold-text"></div>
-
-      <div id="result" class="pull-result">
-        <img id="itemImage" src="" width="300" />
-        <p id="itemText"></p>
-        <p id="itemRarity"></p>
-      </div>
+  <!-- INDEX -->
+  <div id="index" class="section">
+    <h2>Your Collection</h2>
+    <div id="searchFilterContainer">
+      <input type="text" id="searchInput" placeholder="Search name..." oninput="updateIndexList()" />
+      <select id="rarityFilter" onchange="updateIndexList()">
+        <option value="">All Rarities</option>
+      </select>
     </div>
+    <div id="artistIndex"></div>
+  </div>
 
-    <!-- INDEX SECTION -->
-    <div id="index" class="section">
-      <h2>Your Collection</h2>
-      <div id="searchFilterContainer">
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="Search name..."
-          oninput="updateIndexList()"
-        />
-        <select id="rarityFilter" onchange="updateIndexList()">
-          <option value="">All Rarities</option>
-          <!-- Options added dynamically -->
-        </select>
-      </div>
-      <div id="artistIndex"></div>
-    </div>
+  <!-- COINS -->
+  <div id="coins" class="section">
+    <h2>Earn Coins</h2>
+    <p>Click the image to earn 1 coin</p>
+    <p class="coinCount">Coins: 0</p>
+    <img
+      id="coinImage"
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Gold_coin_icon.png/600px-Gold_coin_icon.png"
+      onclick="earnCoin()"
+    />
+  </div>
 
-    <!-- COINS SECTION -->
-    <div id="coins" class="section">
-      <h2>Earn Coins</h2>
-      <p>Click the image to earn 1 coin</p>
-      <p class="coinCount">Coins: 0</p>
-      <img
-        id="coinImage"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Gold_coin_icon.png/600px-Gold_coin_icon.png"
-        onclick="earnCoin()"
-      />
-    </div>
+  <!-- MODAL -->
+  <div id="modal">
+    <span class="close-btn" onclick="closeModal()">✕</span>
+    <span class="modal-arrow left-arrow" onclick="navigateModal(-1)">❮</span>
+    <img id="modalImage" src="" />
+    <h2 id="modalName"></h2>
+    <p id="modalRarity"></p>
+    <span class="modal-arrow right-arrow" onclick="navigateModal(1)">❯</span>
+  </div>
 
-    <!-- MODAL -->
-    <div id="modal">
-      <span class="close-btn" onclick="closeModal()">✕</span>
-      <span class="modal-arrow left-arrow" onclick="navigateModal(-1)">❮</span>
-      <img id="modalImage" src="" />
-      <h2 id="modalName"></h2>
-      <p id="modalRarity"></p>
-      <span class="modal-arrow right-arrow" onclick="navigateModal(1)">❯</span>
-    </div>
+  <!-- SCRIPT -->
+  <script>
+    const items = [
+      { name: "Lisa Lisa", image: "images/lisalisa.png", rarity: "1 in 25", chance: 4 },
+      { name: "Neru", image: "images/neru.jpeg", rarity: "1 in 10", chance: 10 },
+      { name: "Erina", image: "images/erina.png", rarity: "1 in 50", chance: 2 },
+      { name: "Kasane Teto", image: "images/kasaneteto.webp", rarity: "1 in 75", chance: 1.33 },
+      { name: "Hatsune Miku", image: "images/hatsune-miku.png", rarity: "1 in 100", chance: 1 },
+      { name: "Maka", image: "images/maka.jpeg", rarity: "1 in 50", chance: 2 },
+      { name: "Tsubaki", image: "images/tsubaki.png", rarity: "1 in 75", chance: 1.33 },
+      { name: "Jolyne", image: "images/jolyne.png", rarity: "1 in 75", chance: 1.33 },
+      { name: "Asuka", image: "images/asuka.png", rarity: "1 in 200", chance: 0.5 },
+      { name: "Rei", image: "images/rei-ayanami.png", rarity: "1 in 150", chance: 0.67 },
+      { name: "Rei (long hair)", image: "images/rei-ayanami-long-hair.png", rarity: "1 in 250", chance: 0.4 },
+      { name: "Mariah", image: "images/mariah.png", rarity: "1 in 125", chance: 0.8 },
+      { name: "Rias Gremory", image: "https://th.bing.com/th/id/OIP.Ht_vsJZAQi2nmJtK6BIBzQHaEK?w=327&h=183", rarity: "1 in 500", chance: 0.2 },
+      { name: "Uzaki", image: "https://desu.shikimori.me/uploads/poster/mangas/114417/preview_alt_2x-18170a0fed6c626529fefe6572da8f56.jpeg", rarity: "1 in 1000", chance: 0.1 },
+      { name: "Nijou Aki", image: "https://static.zerochan.net/Nijou.Aki.1024.4246593.webp", rarity: "1 in 1000", chance: 0.1 },
+      { name: "Sakaki", image: "https://th.bing.com/th/id/OIP.B7aTc8-VS5O9vVLy0ZQ-AQHaQd", rarity: "1 in 175", chance: 0.57 },
+      { name: "Nami", image: "https://tse1.mm.bing.net/th/id/OIP.o_Kw9cfYUApyCbJQfX80sgHaHa", rarity: "1 in 175", chance: 0.57 },
+      { name: "Ayane", image: "https://th.bing.com/th/id/OIP.I-1ipROqstUV2C_D-oOy4AHaMX", rarity: "1 in 1500", chance: 0.067 },
+      { name: "Astolfo", image: "https://th.bing.com/th/id/OIP.StcUmb7hBslZ4akFWYGpPgHaFo", rarity: "1 in 2000", chance: 0.05 },
+      { name: "Fem Dio", image: "https://th.bing.com/th/id/OIP.G3FyEXlj0tBY6RXo0LhdSQHaKG", rarity: "1 in 300", chance: 0.33 },
+      { name: "Megumi", image: "https://th.bing.com/th/id/OIP.mjts7lC4mS762bsMtsx3KwHaNK", rarity: "1 in 250", chance: 0.4 },
+      { name: "PB", image: "https://pbs.twimg.com/media/GM__a03WcAAR7uy?format=jpg&name=4096x4096", rarity: "1 in 2050", chance: 0.049 },
+      { name: "Cassie", image: "https://pbs.twimg.com/media/GmlrZyPasAAX2yK?format=jpg&name=small", rarity: "1 in 2500", chance: 0.04 },
+      { name: "Maggie", image: "https://pbs.twimg.com/media/Gi9yhTGWkAISAGh?format=jpg&name=small", rarity: "1 in 2200", chance: 0.0454545455 },
+      { name: "Rami", image: "https://pbs.twimg.com/media/F2QiCxDaYAAzwOK?format=jpg&name=small", rarity: "1 in 750", chance: 0.1333333333 },
+      { name: "Duomi", image: "https://pbs.twimg.com/media/F67o3GNXIAAp9pE?format=jpg&name=small", rarity: "1 in 1000", chance: 0.1 },
+      { name: "Conefox", image: "https://pbs.twimg.com/media/GAVioFvWkAAUsxI?format=jpg&name=small", rarity: "1 in 1250", chance: 0.08 }
+    ];
 
-    <!-- Scripts -->
-    <script src="main.js"></script>
-  </body>
+    let pulledSet = new Set();
+    let coins = 0;
+    let pullCounts = {};
+    let modalIndex = 0;
+    let unlockedItems = [];
+
+    function loadGame() {
+      const savedCoins = localStorage.getItem("coins");
+      const savedPulled = localStorage.getItem("pulled");
+      const savedCounts = localStorage.getItem("pullCounts");
+
+      if (savedCoins !== null) coins = parseInt(savedCoins);
+      if (savedPulled !== null) pulledSet = new Set(JSON.parse(savedPulled));
+      if (savedCounts !== null) pullCounts = JSON.parse(savedCounts);
+
+      updateCoinDisplay();
+      populateFilterOptions();
+      updateIndexList();
+    }
+
+    function saveGame() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("pulled", JSON.stringify(Array.from(pulledSet)));
+      localStorage.setItem("pullCounts", JSON.stringify(pullCounts));
+    }
+
+    function updateIndexList() {
+      const index = document.getElementById("artistIndex");
+      const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+      const rarityFilter = document.getElementById("rarityFilter").value;
+
+      index.innerHTML = "";
+      unlockedItems = [];
+
+      items.forEach(item => {
+        const isUnlocked = pulledSet.has(item.name);
+        const matchesSearch = item.name.toLowerCase().includes(searchQuery);
+        const matchesRarity = !rarityFilter || item.rarity === rarityFilter;
+
+        if (!matchesSearch || !matchesRarity) return;
+
+        const div = document.createElement("div");
+        div.className = "artist-card";
+
+        const img = document.createElement("img");
+        img.src = item.image;
+
+        const name = document.createElement("div");
+        name.className = "artist-name";
+
+        const rarity = document.createElement("div");
+        rarity.className = "artist-rarity";
+
+        if (isUnlocked) {
+          name.textContent = item.name;
+          rarity.textContent = item.rarity;
+          img.style.filter = "";
+          div.onclick = () => openModal(item.name);
+          unlockedItems.push(item);
+        } else {
+          name.textContent = "???";
+          rarity.textContent = "";
+          img.style.filter = "blur(10px)";
+          div.onclick = null;
+        }
+
+        div.appendChild(img);
+        div.appendChild(name);
+        div.appendChild(rarity);
+        index.appendChild(div);
+      });
+    }
+
+    function populateFilterOptions() {
+      const rarityFilter = document.getElementById("rarityFilter");
+      const rarities = [...new Set(items.map(i => i.rarity))].sort();
+      rarities.forEach(r => {
+        const option = document.createElement("option");
+        option.value = r;
+        option.textContent = r;
+        rarityFilter.appendChild(option);
+      });
+    }
+
+    function updateCoinDisplay() {
+      document.querySelectorAll(".coinCount").forEach(el => {
+        el.textContent = `Coins: ${coins}`;
+      });
+    }
+
+    function earnCoin() {
+      coins++;
+      updateCoinDisplay();
+      saveGame();
+    }
+
+    function showSection(name) {
+      ["menu", "pull", "index", "coins"].forEach(section => {
+        document.getElementById(section).classList.remove("active");
+      });
+      document.getElementById(name).classList.add("active");
+      if (name === "index") updateIndexList();
+    }
+
+    function pull() {
+      const cost = 50;
+      if (coins < cost) {
+        document.getElementById("message").textContent = "Not enough coins!";
+        return;
+      }
+
+      coins -= cost;
+      updateCoinDisplay();
+      document.getElementById("message").textContent = "";
+
+      // Weighted pull
+      let weightedItems = [];
+      items.forEach(item => {
+        let count = Math.round(item.chance * 10);
+        for (let i = 0; i < count; i++) weightedItems.push(item);
+      });
+
+      const pulledItem = weightedItems[Math.floor(Math.random() * weightedItems.length)];
+      pulledSet.add(pulledItem.name);
+      pullCounts[pulledItem.name] = (pullCounts[pulledItem.name] || 0) + 1;
+      saveGame();
+
+      document.getElementById("itemImage").src = pulledItem.image;
+      document.getElementById("itemText").textContent = pulledItem.name;
+      document.getElementById("itemRarity").textContent = `Rarity: ${pulledItem.rarity}`;
+      document.getElementById("result").style.display = "block";
+
+      updateIndexList();
+    }
+
+    function openModal(name) {
+      const modal = document.getElementById("modal");
+      modal.style.display = "flex";
+      modalIndex = unlockedItems.findIndex(i => i.name === name);
+      updateModal();
+    }
+
+    function closeModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function updateModal() {
+      if (modalIndex < 0) modalIndex = 0;
+      if (modalIndex >= unlockedItems.length) modalIndex = unlockedItems.length - 1;
+
+      const item = unlockedItems[modalIndex];
+      if (!item) return;
+
+      document.getElementById("modalImage").src = item.image;
+      document.getElementById("modalName").textContent = item.name;
+      document.getElementById("modalRarity").textContent = `Rarity: ${item.rarity}`;
+    }
+
+    function navigateModal(dir) {
+      modalIndex += dir;
+      if (modalIndex < 0) modalIndex = unlockedItems.length - 1;
+      if (modalIndex >= unlockedItems.length) modalIndex = 0;
+      updateModal();
+    }
+
+    window.onload = loadGame;
+  </script>
+</body>
 </html>
