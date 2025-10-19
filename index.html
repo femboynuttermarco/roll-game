@@ -224,33 +224,171 @@
   <!-- SCRIPT -->
   <script>
     const items = [
-      { name: "Lisa Lisa", image: "images/lisalisa.png", rarity: "1 in 25", chance: 4 },
-      { name: "Neru", image: "images/neru.jpeg", rarity: "1 in 10", chance: 10 },
-      { name: "Erina", image: "images/erina.png", rarity: "1 in 50", chance: 2 },
-      { name: "Kasane Teto", image: "images/kasaneteto.webp", rarity: "1 in 75", chance: 1.33 },
-      { name: "Hatsune Miku", image: "images/hatsune-miku.png", rarity: "1 in 100", chance: 1 },
-      { name: "Maka", image: "images/maka.jpeg", rarity: "1 in 50", chance: 2 },
-      { name: "Tsubaki", image: "images/tsubaki.png", rarity: "1 in 75", chance: 1.33 },
-      { name: "Jolyne", image: "images/jolyne.png", rarity: "1 in 75", chance: 1.33 },
-      { name: "Asuka", image: "images/asuka.png", rarity: "1 in 200", chance: 0.5 },
-      { name: "Rei", image: "images/rei-ayanami.png", rarity: "1 in 150", chance: 0.67 },
-      { name: "Rei (long hair)", image: "images/rei-ayanami-long-hair.png", rarity: "1 in 250", chance: 0.4 },
-      { name: "Mariah", image: "images/mariah.png", rarity: "1 in 125", chance: 0.8 },
-      { name: "Rias Gremory", image: "https://th.bing.com/th/id/OIP.Ht_vsJZAQi2nmJtK6BIBzQHaEK?w=327&h=183", rarity: "1 in 500", chance: 0.2 },
-      { name: "Uzaki", image: "https://desu.shikimori.me/uploads/poster/mangas/114417/preview_alt_2x-18170a0fed6c626529fefe6572da8f56.jpeg", rarity: "1 in 1000", chance: 0.1 },
-      { name: "Nijou Aki", image: "https://static.zerochan.net/Nijou.Aki.1024.4246593.webp", rarity: "1 in 1000", chance: 0.1 },
-      { name: "Sakaki", image: "https://th.bing.com/th/id/OIP.B7aTc8-VS5O9vVLy0ZQ-AQHaQd", rarity: "1 in 175", chance: 0.57 },
-      { name: "Nami", image: "https://tse1.mm.bing.net/th/id/OIP.o_Kw9cfYUApyCbJQfX80sgHaHa", rarity: "1 in 175", chance: 0.57 },
-      { name: "Ayane", image: "https://th.bing.com/th/id/OIP.I-1ipROqstUV2C_D-oOy4AHaMX", rarity: "1 in 1500", chance: 0.067 },
-      { name: "Astolfo", image: "https://th.bing.com/th/id/OIP.StcUmb7hBslZ4akFWYGpPgHaFo", rarity: "1 in 2000", chance: 0.05 },
-      { name: "Fem Dio", image: "https://th.bing.com/th/id/OIP.G3FyEXlj0tBY6RXo0LhdSQHaKG", rarity: "1 in 300", chance: 0.33 },
-      { name: "Megumi", image: "https://th.bing.com/th/id/OIP.mjts7lC4mS762bsMtsx3KwHaNK", rarity: "1 in 250", chance: 0.4 },
-      { name: "PB", image: "https://pbs.twimg.com/media/GM__a03WcAAR7uy?format=jpg&name=4096x4096", rarity: "1 in 2050", chance: 0.049 },
-      { name: "Cassie", image: "https://pbs.twimg.com/media/GmlrZyPasAAX2yK?format=jpg&name=small", rarity: "1 in 2500", chance: 0.04 },
-      { name: "Maggie", image: "https://pbs.twimg.com/media/Gi9yhTGWkAISAGh?format=jpg&name=small", rarity: "1 in 2200", chance: 0.0454545455 },
-      { name: "Rami", image: "https://pbs.twimg.com/media/F2QiCxDaYAAzwOK?format=jpg&name=small", rarity: "1 in 750", chance: 0.1333333333 },
-      { name: "Duomi", image: "https://pbs.twimg.com/media/F67o3GNXIAAp9pE?format=jpg&name=small", rarity: "1 in 1000", chance: 0.1 },
-      { name: "Conefox", image: "https://pbs.twimg.com/media/GAVioFvWkAAUsxI?format=jpg&name=small", rarity: "1 in 1250", chance: 0.08 }
+      const items = [
+  {
+    name: "Lisa Lisa",
+    image: "images/lisalisa.png",
+    rarity: "1 in 25",
+    chance: 4
+  },
+  {
+    name: "Neru",
+    image: "images/neru.jpeg",
+    rarity: "1 in 10",
+    chance: 10
+  },
+  {
+    name: "Erina",
+    image: "images/erina.png",
+    rarity: "1 in 50",
+    chance: 2
+  },
+  {
+    name: "Kasane Teto",
+    image: "images/kasaneteto.webp",
+    rarity: "1 in 75",
+    chance: 1.33
+  },
+  {
+    name: "Hatsune Miku",
+    image: "images/hatsune-miku.png",
+    rarity: "1 in 100",
+    chance: 1
+  },
+  {
+    name: "Maka",
+    image: "images/maka.jpeg",
+    rarity: "1 in 50",
+    chance: 2
+  },
+  {
+    name: "Tsubaki",
+    image: "images/tsubaki.png",
+    rarity: "1 in 75",
+    chance: 1.33
+  },
+  {
+    name: "Jolyne",
+    image: "images/jolyne.png",
+    rarity: "1 in 75",
+    chance: 1.33
+  },
+  {
+    name: "Asuka",
+    image: "images/asuka.png",
+    rarity: "1 in 200",
+    chance: 0.5
+  },
+  {
+    name: "Rei",
+    image: "images/rei-ayanami.png",
+    rarity: "1 in 150",
+    chance: 0.67
+  },
+  {
+    name: "Rei (long hair)",
+    image: "images/rei-ayanami-long-hair.png",
+    rarity: "1 in 250",
+    chance: 0.4
+  },
+  {
+    name: "Mariah",
+    image: "images/mariah.png",
+    rarity: "1 in 125",
+    chance: 0.8
+  },
+  {
+    name: "Rias Gremory",
+    image: "https://th.bing.com/th/id/OIP.Ht_vsJZAQi2nmJtK6BIBzQHaEK?w=327&h=183&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+    rarity: "1 in 500",
+    chance: 0.2
+  },
+  {
+    name: "Uzaki",
+    image: "https://desu.shikimori.me/uploads/poster/mangas/114417/preview_alt_2x-18170a0fed6c626529fefe6572da8f56.jpeg",
+    rarity: "1 in 1000",
+    chance: 0.1
+  },
+  {
+    name: "Nijou Aki",
+    image: "https://static.zerochan.net/Nijou.Aki.1024.4246593.webp",
+    rarity: "1 in 1000",
+    chance: 0.1
+  },
+  {
+    name: "Sakaki",
+    image: "https://th.bing.com/th/id/OIP.B7aTc8-VS5O9vVLy0ZQ-AQHaQd?w=115&h=188&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+    rarity: "1 in 175",
+    chance: 0.57
+  },
+  {
+    name: "Nami",
+    image: "https://tse1.mm.bing.net/th/id/OIP.o_Kw9cfYUApyCbJQfX80sgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
+    rarity: "1 in 175",
+    chance: 0.57
+  },
+  {
+    name: "Ayane",
+    image: "https://th.bing.com/th/id/OIP.I-1ipROqstUV2C_D-oOy4AHaMX?w=182&h=305&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+    rarity: "1 in 1500",
+    chance: 0.067
+  },
+  {
+    name: "Astolfo",
+    image: "https://th.bing.com/th/id/OIP.StcUmb7hBslZ4akFWYGpPgHaFo?w=182&h=138&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+    rarity: "1 in 2000",
+    chance: 0.05
+  },
+  {
+    name: "Fem Dio",
+    image: "https://th.bing.com/th/id/OIP.G3FyEXlj0tBY6RXo0LhdSQHaKG?w=182&h=247&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3",
+    rarity: "1 in 300",
+    chance: 0.33
+  },
+  {
+    name: "Megumin",
+    image: "https://th.bing.com/th/id/OIP.mjts7lC4mS762bsMtsx3KwHaNK?w=182&h=324&c=7&r=0&o=5&dpr=1.3&pid=1.7",
+    rarity: "1 in 250",
+    chance: 0.4
+  },
+  {
+    name: "PB",
+    image: "https://pbs.twimg.com/media/GM__a03WcAAR7uy?format=jpg&name=4096x4096",
+    rarity: "1 in 2050",
+    chance: 0.049
+  },
+  {
+    name: "Cassie",
+    image: "https://pbs.twimg.com/media/GmlrZyPasAAX2yK?format=jpg&name=small",
+    rarity: "1 in 2500",
+    chance: 0.04
+  },
+  {
+    name: "Maggie",
+    image: "https://pbs.twimg.com/media/Gi9yhTGWkAISAGh?format=jpg&name=small",
+    rarity: "1 in 2200",
+    chance: 0.0454545455
+  },
+  {
+    name: "Rami",
+    image: "https://pbs.twimg.com/media/F2QiCxDaYAAzwOK?format=jpg&name=small",
+    rarity: "1 in 750",
+    chance: 0.1333333333
+  },
+  {
+    name: "Duomi",
+    image: "https://pbs.twimg.com/media/F67o3GNXIAAp9pE?format=jpg&name=small",
+    rarity: "1 in 1000",
+    chance: 0.1
+  },
+  {
+    name: "Conefox",
+    image: "https://pbs.twimg.com/media/GAVioFvWkAAUsxI?format=jpg&name=small",
+    rarity: "1 in 1250",
+    chance: 0.08
+  }
+];
+
     ];
 
     let pulledSet = new Set();
